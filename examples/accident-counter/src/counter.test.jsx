@@ -5,12 +5,9 @@ import { Counter } from './counter';
 
 import '@testing-library/jest-dom/vitest';
 import { act } from 'react';
+import { count } from 'console';
 
 describe('Counter ', () => {
-  // beforeEach(() => {
-  //   render(<Counter />);
-  // });
-
   it('renders with an initial count of 0', () => {
     render(<Counter />);
     const counter = screen.getByTestId('counter-count');
@@ -61,16 +58,38 @@ describe('Counter ', () => {
     expect(unit).toHaveTextContent('day');
   });
 
-  it.todo(
+  it(
     'decrements the count when the "Decrement" button is clicked',
     async () => {
       render(<Counter initialCount={1} />);
 
       const decrementButton = screen.getByRole('button', { name: /decrement/i });
+      const counter = screen.getByTestId('counter-count');
+
+      expect(decrementButton).not.toBeDisabled();
+
+      await act(async () => {
+        await userEvent.click(decrementButton);
+      });
+
+      expect(counter).toHaveTextContent('0');
+      expect(decrementButton).toBeDisabled();
     },
   );
 
-  it.todo('does not allow decrementing below 0', async () => { });
+  it('does not allow decrementing below 0', async () => {
+    render(<Counter />);
+
+
+    const decrementButton = screen.getByRole('button', { name: /decrement/i });
+    const counter = screen.getByTestId('counter-count');
+
+    await act(async () => {
+      await userEvent.click(decrementButton);
+    })
+
+    expect(counter).toHaveTextContent('0');
+  });
 
   it.todo(
     'resets the count when the "Reset" button is clicked',
@@ -82,5 +101,15 @@ describe('Counter ', () => {
     () => { },
   );
 
-  it.todo('updates the document title based on the count', async () => { });
+  it.todo('updates the document title based on the count', async () => {
+    render(<Counter />);
+
+    const incrementButton = screen.getByRole('button', { name: /increment/i });
+
+    await act(async () => {
+      await userEvent.click(incrementButton);
+    });
+
+    expect(document.title).toEqual(expect.stringContaining('1 day'));
+  });
 });
